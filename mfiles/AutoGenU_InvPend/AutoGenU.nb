@@ -1,0 +1,621 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 8.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[     18058,        612]
+NotebookOptionsPosition[     15828,        530]
+NotebookOutlinePosition[     16281,        548]
+CellTagsIndexPosition[     16238,        545]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Set Directory and Filename of the Input File", "Subsection"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"SetDirectory", "[", 
+  RowBox[{"NotebookDirectory", "[", "]"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"InpFile", "=", "\"\<inputInvPendC.m\>\""}]}], "Input",
+ CellChangeTimes->{{3.526161431153847*^9, 3.526161479935133*^9}, {
+   3.5261615266336184`*^9, 3.5261615430292473`*^9}, 3.5261769283054028`*^9, {
+   3.6774762185319047`*^9, 3.6774762507912617`*^9}, {3.6774856861746273`*^9, 
+   3.677485688073736*^9}, 3.677486182171997*^9}],
+
+Cell[BoxData["\<\"K:\\\\ohtsuka\\\\AutoGen\\\\AutoGenU\\\\agInvPend\\\\\
+CheckForBook\"\>"], "Output",
+ CellChangeTimes->{
+  3.5261614809491343`*^9, {3.5261615477092557`*^9, 3.526161574213702*^9}, 
+   3.5261618734760275`*^9, 3.5261664869809594`*^9, 3.5261740006159906`*^9, 
+   3.526176933593812*^9, 3.5261769861191044`*^9, {3.6774762291071544`*^9, 
+   3.677476252591274*^9}, 3.6774763895883493`*^9, 3.6774766103339214`*^9, 
+   3.67747664310332*^9, 3.6774861838930955`*^9}],
+
+Cell[BoxData["\<\"inputInvPendC.m\"\>"], "Output",
+ CellChangeTimes->{
+  3.5261614809491343`*^9, {3.5261615477092557`*^9, 3.526161574213702*^9}, 
+   3.5261618734760275`*^9, 3.5261664869809594`*^9, 3.5261740006159906`*^9, 
+   3.526176933593812*^9, 3.5261769861191044`*^9, {3.6774762291071544`*^9, 
+   3.677476252591274*^9}, 3.6774763895883493`*^9, 3.6774766103339214`*^9, 
+   3.67747664310332*^9, 3.677486183902096*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Functions for C Code Generation", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["Differentiation by a Vector:  Dv", "Subsubsection",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Dv", "[", 
+   RowBox[{"f_", ",", "x_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"j", ",", "ans"}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"ans", "=", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{
+         SubscriptBox["\[PartialD]", 
+          RowBox[{
+          "x", "\[LeftDoubleBracket]", "j", "\[RightDoubleBracket]"}]], "f"}],
+         ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", 
+          RowBox[{"Length", "[", "x", "]"}]}], "}"}]}], "]"}]}], ";", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Length", "[", 
+         RowBox[{"Dimensions", "[", "ans", "]"}], "]"}], "\[NotEqual]", "1"}],
+        ",", 
+       RowBox[{"ans", "=", 
+        RowBox[{"Transpose", "[", "ans", "]"}]}]}], "]"}], ";", "ans"}]}], 
+   "]"}]}]], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Constuction of an n by n Symmetric Matrix from a Vector", \
+"Subsubsection",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Sym", "[", 
+   RowBox[{"v_", ",", "n_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"i", ",", "j", ",", "iv", ",", "ans"}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"ans", "=", 
+      RowBox[{"Table", "[", 
+       RowBox[{"0", ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "n"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", "n"}], "}"}]}], "]"}]}], ";", 
+     RowBox[{"iv", "=", "1"}], ";", 
+     RowBox[{"i", "=", "0"}], ";", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{"Do", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+           RowBox[{"ans", "\[LeftDoubleBracket]", 
+            RowBox[{"j", ",", 
+             RowBox[{"j", "+", "i"}]}], "\[RightDoubleBracket]"}], "=", 
+           RowBox[{
+           "v", "\[LeftDoubleBracket]", "iv", "\[RightDoubleBracket]"}]}], 
+          ";", 
+          RowBox[{
+           RowBox[{"ans", "\[LeftDoubleBracket]", 
+            RowBox[{
+             RowBox[{"j", "+", "i"}], ",", "j"}], "\[RightDoubleBracket]"}], 
+           "=", 
+           RowBox[{
+           "v", "\[LeftDoubleBracket]", "iv", "\[RightDoubleBracket]"}]}], 
+          ";", 
+          RowBox[{"iv", "++"}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"j", ",", 
+           RowBox[{"n", "-", "i"}]}], "}"}]}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "0", ",", 
+         RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}], ";", "ans"}]}], 
+   "]"}]}]], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Construction of a Vector from an n by n Symmetric Matrix", \
+"Subsubsection",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"DeSym", "[", 
+   RowBox[{"S_", ",", "n_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"i", ",", "j", ",", 
+      RowBox[{"ans", "=", 
+       RowBox[{"{", "}"}]}]}], "}"}], ",", 
+    RowBox[{
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{"Do", "[", 
+        RowBox[{
+         RowBox[{"AppendTo", "[", 
+          RowBox[{"ans", ",", 
+           RowBox[{"S", "\[LeftDoubleBracket]", 
+            RowBox[{"j", ",", 
+             RowBox[{"j", "+", "i"}]}], "\[RightDoubleBracket]"}]}], "]"}], 
+         ",", 
+         RowBox[{"{", 
+          RowBox[{"j", ",", 
+           RowBox[{"n", "-", "i"}]}], "}"}]}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "0", ",", 
+         RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}], ";", "ans"}]}], 
+   "]"}]}]], "Input",
+ AspectRatioFixed->True]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["User Settings", "Section"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Off", "[", 
+   RowBox[{"General", "::", "spell"}], "]"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Default", " ", "Values"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"SimplifyLevel", "=", "0"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Precondition", "=", "0"}], ";"}]}], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Get", "[", "InpFile", "]"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Read", " ", "Input", " ", "File"}], " ", "*)"}]}]], "Input"],
+
+Cell[BoxData[{
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{"dimx", " ", "!=", " ", 
+    RowBox[{"Length", "[", "fxu", "]"}]}], ",", " ", 
+   RowBox[{
+    RowBox[{
+    "\"\<Warning! Dimension Missmatch in dimx and fxu.\>\"", ">>", 
+     "outfile"}], ";", 
+    RowBox[{
+     StyleBox["Abort", "MR"], 
+     StyleBox["[", "MR"], " ", 
+     StyleBox["]", "MR"]}], ";"}]}], "]"}], "\n", 
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Length", "[", "MyVarNames", "]"}], "!=", " ", 
+    RowBox[{"Length", "[", "MyVarValues", "]"}]}], ",", " ", 
+   RowBox[{
+    RowBox[{
+    "\"\<Warning! Dimension Missmatch in MyVarNames and MyVarValues\>\"", ">>",
+      "outfile"}], ";", 
+    RowBox[{
+     StyleBox["Abort", "MR"], 
+     StyleBox["[", "MR"], " ", 
+     StyleBox["]", "MR"]}], ";"}]}], "]"}], "\n", 
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"Length", "[", "MyArrNames", "]"}], "!=", " ", 
+      RowBox[{"Length", "[", "MyArrDims", "]"}]}], ")"}], "||", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"Length", "[", "MyArrDims", "]"}], "!=", " ", 
+      RowBox[{"Length", "[", "MyArrValues", "]"}]}], ")"}]}], ",", " ", 
+   RowBox[{
+    RowBox[{
+    "\"\<Warning! Dimension Missmatch in MyArrNames, MyArrDims and \
+MyArrValues\>\"", ">>", "outfile"}], ";", 
+    RowBox[{
+     StyleBox["Abort", "MR"], 
+     StyleBox["[", "MR"], " ", 
+     StyleBox["]", "MR"]}], ";"}]}], "]"}], "\n"}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Generate RHC Algorithm", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[CellGroupData[{
+
+Cell["Euler-Lagrange Equations", "Subsubsection",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"H", "=", 
+   RowBox[{"L", "+", 
+    RowBox[{"lmdv", ".", "fxu"}], "+", 
+    RowBox[{"muv", ".", "Cxu"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"uv", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{"uv", ",", "muv"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"dimuc", "=", 
+   RowBox[{"dimu", "+", "dimc"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Hx", "=", 
+   RowBox[{"Dv", "[", 
+    RowBox[{"H", ",", "xv"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Hu", "=", 
+   RowBox[{"Dv", "[", 
+    RowBox[{"H", ",", "uv"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{"SimplifyLevel", ">", "0"}], ",", 
+   RowBox[{
+    RowBox[{"Hx", "=", 
+     RowBox[{"Simplify", "[", "Hx", "]"}]}], ";", 
+    RowBox[{"Hu", "=", 
+     RowBox[{"Simplify", "[", "Hu", "]"}]}], ";"}]}], "]"}], "\n", 
+ RowBox[{
+  RowBox[{"dlmddt", "=", 
+   RowBox[{"-", "Hx"}]}], ";"}]}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{"Precondition", "==", "1"}], ",", "\n", "\t", 
+   RowBox[{
+    RowBox[{"Huu", "=", 
+     RowBox[{"Dv", "[", 
+      RowBox[{"Hu", ",", "uv"}], "]"}]}], ";", "\n", "\t", 
+    RowBox[{"Hu", "=", 
+     RowBox[{"LinearSolve", "[", 
+      RowBox[{"Huu", ",", "Hu"}], "]"}]}], ";", "\n", "\t", 
+    RowBox[{"If", "[", 
+     RowBox[{
+      RowBox[{"SimplifyLevel", ">", "0"}], ",", 
+      RowBox[{"Hu", "=", 
+       RowBox[{"Simplify", "[", "Hu", "]"}]}]}], "]"}], ";"}]}], "\n", 
+  "]"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell["Boudary Conditions", "Subsubsection",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"phix", "=", 
+   RowBox[{"Dv", "[", 
+    RowBox[{"phi", ",", "xv"}], "]"}]}], ";"}], "\n", 
+ RowBox[{"If", "[", 
+  RowBox[{
+   RowBox[{"SimplifyLevel", ">", "0"}], ",", 
+   RowBox[{
+    RowBox[{"phix", "=", 
+     RowBox[{"Simplify", "[", "phix", "]"}]}], ";"}]}], "]"}]}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Generate C Code", "Section",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[
+ RowBox[{"<<", "Format3`", " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"Format3", " ", "for", " ", 
+     RowBox[{"ver", ".", " ", "9.0"}]}], ",", " ", 
+    RowBox[{"Format2", " ", "for", " ", "earlier", " ", 
+     RowBox[{"versions", "."}]}]}], " ", "*)"}]}]], "Input",
+ CellChangeTimes->{{3.6774766038090925`*^9, 3.6774766039650927`*^9}, {
+  3.6774862267415466`*^9, 3.6774862840398235`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"<<", "Optimize2`"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell["Conversion of Arrays", "Subsubsection",
+ Evaluatable->False,
+ AspectRatioFixed->True],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ArrNames", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{"MyArrNames", ",", 
+     RowBox[{"{", 
+      RowBox[{
+      "\"\<x\>\"", ",", "\"\<lmd\>\"", ",", "\"\<u\>\"", ",", "\"\<p\>\"", 
+       ",", "\"\<dx\>\"", ",", "\"\<dlmd\>\"", ",", "\"\<hu\>\""}], "}"}]}], 
+    "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"ArrDims", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{"MyArrDims", ",", 
+     RowBox[{"{", 
+      RowBox[{
+      "dimx", ",", "dimx", ",", "dimuc", ",", "dimp", ",", "dimx", ",", 
+       "dimx", ",", "dimuc"}], "}"}]}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"ArrCnv", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Do", "[", 
+   RowBox[{
+    RowBox[{"ArrCnv", "=", 
+     RowBox[{"Join", "[", 
+      RowBox[{"ArrCnv", ",", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+           RowBox[{
+           "ArrNames", "\[LeftDoubleBracket]", "j", "\[RightDoubleBracket]"}],
+            "<>", "\"\<[\>\"", "<>", 
+           RowBox[{"ToString", "[", "i", "]"}], "<>", "\"\<]\>\""}], 
+          "\[Rule]", 
+          RowBox[{
+           RowBox[{
+           "ArrNames", "\[LeftDoubleBracket]", "j", "\[RightDoubleBracket]"}],
+            "<>", "\"\<[\>\"", "<>", 
+           RowBox[{"ToString", "[", 
+            RowBox[{"i", "-", "1"}], "]"}], "<>", "\"\<]\>\""}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", 
+           RowBox[{
+           "ArrDims", "\[LeftDoubleBracket]", "j", 
+            "\[RightDoubleBracket]"}]}], "}"}]}], "]"}]}], "]"}]}], ",", 
+    RowBox[{"{", 
+     RowBox[{"j", ",", 
+      RowBox[{"Length", "[", "ArrNames", "]"}]}], "}"}]}], "]"}], 
+  ";"}]}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{"Optimize", ",", 
+    RowBox[{"OptimizeVariable", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"o", ",", "Array"}], "}"}]}], ",", 
+    RowBox[{"OptimizeNull", "->", 
+     RowBox[{"Prepend", "[", 
+      RowBox[{
+       RowBox[{"ToExpression", "[", "ArrNames", "]"}], ",", "List"}], "]"}]}],
+     ",", 
+    RowBox[{"OptimizeCoefficients", "\[Rule]", "True"}], ",", 
+    RowBox[{"OptimizeProcedure", "\[Rule]", "False"}]}], "]"}], 
+  ";"}]], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"lept", "=", 
+   RowBox[{"Length", "[", 
+    RowBox[{
+     RowBox[{"Optimize", "[", "pt", "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"leph", "=", 
+   RowBox[{"Length", "[", 
+    RowBox[{
+     RowBox[{"Optimize", "[", "phix", "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"lexp", "=", 
+   RowBox[{"Length", "[", 
+    RowBox[{
+     RowBox[{"Optimize", "[", "fxu", "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"lelp", "=", 
+   RowBox[{"Length", "[", 
+    RowBox[{
+     RowBox[{"Optimize", "[", "dlmddt", "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"lehu", "=", 
+   RowBox[{"Length", "[", 
+    RowBox[{
+     RowBox[{"Optimize", "[", "Hu", "]"}], "[", 
+     RowBox[{"[", "1", "]"}], "]"}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"leno", "=", 
+   RowBox[{"Max", "[", 
+    RowBox[{"{", 
+     RowBox[{"lept", ",", "leph", ",", "lexp", ",", "lelp", ",", "lehu"}], 
+     "}"}], "]"}]}], ";"}]}], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ArrCnv2", "=", "ArrCnv"}], ";"}], "\n", 
+ RowBox[{"Do", "[", "\n", "\t", 
+  RowBox[{"ArrCnv2", "=", 
+   RowBox[{"Join", "[", 
+    RowBox[{"ArrCnv2", ",", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"\"\<o[\>\"", "<>", 
+         RowBox[{"ToString", "[", "i", "]"}], "<>", "\"\<]\>\""}], "\[Rule]", 
+        RowBox[{"\"\<o[\>\"", "<>", 
+         RowBox[{"ToString", "[", 
+          RowBox[{"i", "-", "1"}], "]"}], "<>", "\"\<]\>\""}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "leno"}], "}"}]}], "]"}]}], "]"}]}], "\n", 
+  "]"}]}], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetOptions", "[", 
+   RowBox[{"CAssign", ",", 
+    RowBox[{"AssignOptimize", "->", "True"}], ",", 
+    RowBox[{"AssignPrecision", "\[Rule]", "10"}], ",", 
+    RowBox[{"AssignReplace", "->", "ArrCnv2"}], ",", 
+    RowBox[{"AssignToArray", "->", 
+     RowBox[{"ToExpression", "[", "ArrNames", "]"}]}], ",", 
+    RowBox[{"AssignIndent", "\[Rule]", "\"\<    \>\""}]}], "]"}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.5261616981619196`*^9, 3.526161698770321*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Output to File", "Subsubsection"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"outfile", "=", 
+   RowBox[{"StringJoin", "[", 
+    RowBox[{"outfn", ",", "\"\<.c\>\""}], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"Splice", "[", 
+   RowBox[{"\"\<AutoGenU.mc\>\"", ",", "outfile", ",", 
+    RowBox[{"FormatType", "->", "OutputForm"}]}], "]"}], ";"}]}], "Input",
+ AspectRatioFixed->True]
+}, Open  ]]
+}, Open  ]]
+},
+CellGrouping->Manual,
+WindowSize->{1358, 668},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+PrivateNotebookOptions->{"VersionedStylesheet"->{"Default.nb"[8.] -> True}},
+FrontEndVersion->"9.0 for Microsoft Windows (64-bit) (2013\:5e741\:670828\
+\:65e5)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 66, 0, 36, "Subsection"],
+Cell[CellGroupData[{
+Cell[670, 26, 456, 7, 52, "Input"],
+Cell[1129, 35, 472, 7, 30, "Output"],
+Cell[1604, 44, 418, 6, 30, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2071, 56, 96, 2, 71, "Section",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[2192, 62, 103, 2, 27, "Subsubsection",
+ Evaluatable->False],
+Cell[2298, 66, 895, 29, 31, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3230, 100, 128, 3, 27, "Subsubsection",
+ Evaluatable->False],
+Cell[3361, 105, 1540, 46, 31, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4938, 156, 129, 3, 27, "Subsubsection",
+ Evaluatable->False],
+Cell[5070, 161, 874, 28, 31, "Input"]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[5993, 195, 32, 0, 41, "Section"],
+Cell[6028, 197, 329, 9, 92, "Input"],
+Cell[6360, 208, 164, 4, 31, "Input"],
+Cell[6527, 214, 1446, 44, 112, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[8010, 263, 87, 2, 41, "Section",
+ Evaluatable->False],
+Cell[CellGroupData[{
+Cell[8122, 269, 95, 2, 27, "Subsubsection",
+ Evaluatable->False],
+Cell[8220, 273, 933, 32, 152, "Input"]
+}, Open  ]],
+Cell[9168, 308, 548, 16, 112, "Input"],
+Cell[CellGroupData[{
+Cell[9741, 328, 89, 2, 27, "Subsubsection",
+ Evaluatable->False],
+Cell[9833, 332, 341, 11, 52, "Input"]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[10223, 349, 80, 2, 41, "Section",
+ Evaluatable->False],
+Cell[10306, 353, 414, 9, 31, "Input"],
+Cell[10723, 364, 54, 1, 31, "Input"],
+Cell[CellGroupData[{
+Cell[10802, 369, 91, 2, 27, "Subsubsection",
+ Evaluatable->False],
+Cell[10896, 373, 1722, 51, 92, "Input"]
+}, Open  ]],
+Cell[12633, 427, 512, 14, 31, "Input"],
+Cell[13148, 443, 1127, 36, 132, "Input"],
+Cell[14278, 481, 619, 17, 92, "Input"],
+Cell[14900, 500, 494, 11, 31, "Input"],
+Cell[CellGroupData[{
+Cell[15419, 515, 39, 0, 27, "Subsubsection"],
+Cell[15461, 517, 339, 9, 52, "Input"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

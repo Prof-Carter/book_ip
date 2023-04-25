@@ -1,0 +1,27 @@
+clear
+format compact
+% --- ステップ 1 ---------
+A = [  0  1           % 不安定
+      10 -2 ];
+% --- ステップ 2 ---------
+n = length(A);
+P = sdpvar(n,n,'sy');
+% --- ステップ 3 ---------
+LMI = [];
+
+ep = 1e-6;
+M1 = P; - eye(n);
+M2 = P*A + A'*P;
+LMI = [ LMI, M1 >=   ep*eye(n) ];
+LMI = [ LMI, M2 <= - ep*eye(n) ];
+% --- ステップ 4 ---------
+sol = solvesdp(LMI)
+% ------------------------
+eigen_A = eig(A)      % A の固有値（実部がすべて負なら安定）
+
+if sol.problem ~= 1   % LMI が可解なら
+  % --- ステップ 5 -------
+  P_feas = double(P)
+  eig(double( M1))    % M1 > 0 なら  M1 の固有値はすべて正
+  eig(double(-M2))    % M2 < 0 なら -M2 の固有値はすべて正
+end

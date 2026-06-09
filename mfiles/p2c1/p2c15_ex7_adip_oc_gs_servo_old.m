@@ -1,7 +1,12 @@
 % 例 1.7
 % アーム型倒立振子
 % ゲインスケジューリング制御の非線形シミュレーション結果とアニメーション表示
-% 2026/06/09：更新
+%
+% この古いファイル
+% 　p2c15_ex7_adip_oc_gs_servo_old.m
+% をエラーなく実行するには，古いバージョンの YALMIP
+% 　https://github.com/yalmip/YALMIP/archive/refs/tags/R20170818.zip
+% を利用してください
 
 clear
 format compact
@@ -103,13 +108,8 @@ M2 = M2 - blkdiag(S22*g2+ep*eye(n),zeros(n));
 M3 = M3 - blkdiag(S31*g1+Sa33*g3a+Sb33*g3b+ep*eye(n),zeros(n),zeros(m));
 % ----------------------------
 % SOS set
-POL = {S11,S22,S31,Sa33,Sb33,M1,M2,M3};
-CON = [];
-for ii = 1:length(POL)  
-    CON = [CON,sos(POL{ii})];
-end
-%CON = [sos(S11),sos(S22),sos(S31),sos(Sa33),sos(Sb33)];
-%CON = [CON,sos(M1),sos(M2),sos(M3)];
+CON = [sos(S11),sos(S22),sos(S31),sos(Sa33),sos(Sb33)];
+CON = [CON,sos(M1),sos(M2),sos(M3)];
 params = recover(setdiff(depends(CON),depends([rho0,rho,drho])));
 % ----------------------------
 % objective
@@ -127,13 +127,11 @@ gamma_obj = 1.06*double(gamma);
 
 % ==================================================
 [sol,monos,calQ] = solvesos([CON,gamma<=gamma_obj],[],[],params)
-%[sol,monos,calQ] = solvesos([CON,gamma<=gamma_obj],[],options,params)
 
 % ----------------------------
 for ii=1:length(CON)
 	h = sosd(CON(ii));
-%    if max(abs(double(coefficients(CON{ii}-h'*h,[rho0;rho;drho])))) > 1e-6   
-    if max(abs(double(coefficients(POL{ii}-h'*h,[rho0;rho;drho])))) > 1e-6*length(POL{ii})^2 
+    if max(abs(double(coefficients(CON{ii}-h'*h,[rho0;rho;drho])))) > 1e-6
         disp('Infeasible!!')
     else
         disp('Feasible!!')        
